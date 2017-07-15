@@ -1,16 +1,5 @@
 package plugin.google.maps;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Locale;
-
-import org.apache.cordova.CallbackContext;
-import org.apache.cordova.CordovaResourceApi;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -31,6 +20,17 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import org.apache.cordova.CallbackContext;
+import org.apache.cordova.CordovaResourceApi;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Locale;
 
 public class PluginMarker extends MyPlugin {
   
@@ -780,6 +780,11 @@ public class PluginMarker extends MyPlugin {
         @Override
         protected void onPostExecute(Bitmap image) {
           if (image == null) {
+            callback.onPostExecute(marker);
+            return;
+          }
+
+          if (marker == null) {
             callback.onPostExecute(marker);
             return;
           }
