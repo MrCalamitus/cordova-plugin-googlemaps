@@ -1,4 +1,5 @@
 /* global cordova, plugin, CSSPrimitiveValue */
+//TESTING FOR NOTIFY REPO
 var PLUGIN_NAME = 'GoogleMaps';
 var MARKERS = {};
 var KML_LAYERS = {};
