@@ -277,7 +277,13 @@ NSDictionary *initOptions;
     }
   
     [self.view addSubview: self.map];
+    // Attach an additional click handler
+    for(UIGestureRecognizer *g in self.map.gestureRecognizers){
+        [g addTarget:self action:@selector(tapTouchTap:)];
+    }
+
   
+    
     dispatch_async(dispatch_get_main_queue(), ^{
       if (cameraBounds != nil) {
         float scale = 1;
@@ -299,6 +305,11 @@ NSDictionary *initOptions;
     });
 }
 
+- (void)tapTouchTap:(UITapGestureRecognizer*)touchGesture
+{
+    CGPoint point = [touchGesture locationInView:self.view];
+    self.lastTapCoordinate = [self.map.projection coordinateForPoint:point];
+}
 
 - (void)didReceiveMemoryWarning
 {
@@ -426,7 +437,7 @@ NSDictionary *initOptions;
       [overlayClass isEqualToString:@"GMSPolyline"] ||
       [overlayClass isEqualToString:@"GMSCircle"] ||
       [overlayClass isEqualToString:@"GMSGroundOverlay"]) {
-    [self triggerOverlayEvent:@"overlay_click" id:overlay.title];
+    [self triggerOverlayEvent:@"overlay_click" id:overlay.title coordinate:self.lastTapCoordinate];
   }
 }
 
@@ -490,10 +501,9 @@ NSDictionary *initOptions;
 /**
  * Involve App._onOverlayEvent
  */
-- (void)triggerOverlayEvent: (NSString *)eventName id:(NSString *) id
+- (void)triggerOverlayEvent: (NSString *)eventName id:(NSString *) id coordinate:(CLLocationCoordinate2D) coordinate
 {
-  NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onOverlayEvent('%@', '%@');",
-                                      eventName, id];
+  NSString* jsString = [NSString stringWithFormat:@"plugin.google.maps.Map._onOverlayEvent('%@', '%@', new window.plugin.google.maps.LatLng(%f,%f));",eventName, id, coordinate.latitude, coordinate.longitude];
 	if ([self.webView respondsToSelector:@selector(stringByEvaluatingJavaScriptFromString:)]) {
 		[self.webView performSelector:@selector(stringByEvaluatingJavaScriptFromString:) withObject:jsString];
 	} else if ([self.webView respondsToSelector:@selector(evaluateJavaScript:completionHandler:)]) {
